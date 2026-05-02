@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📖 Elham's Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf8f4;--bg2:#f5f1eb;--bg3:#ede9e0;--text:#2d2a24;--text-dim:#6b6560;--border:rgba(180,83,9,0.15);--green:#2d7a3a;--amber:#b45309;--pink:#c2185b;--blue:#1a56a0;--purple:#6d28d9;--body:'Inter',sans-serif;--display:'Lora',serif;--hand:'Caveat',cursive;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden;}
+nav{position:fixed;top:0;width:100%;z-index:200;background:rgba(250,248,244,0.96);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;}
+.nav-logo{font-family:var(--hand);font-size:20px;color:var(--amber);}
+.nav-right{display:flex;align-items:center;gap:1.5rem;}
+.nav-link{font-family:var(--body);font-size:13px;color:var(--text-dim);text-decoration:none;transition:color 0.2s;}
+.nav-link:hover{color:var(--amber);}
+.hero{position:relative;z-index:2;padding:90px 2rem 2rem;max-width:780px;margin:0 auto;text-align:center;}
+.hero-title{font-family:var(--hand);font-size:clamp(2rem,6vw,4rem);color:var(--amber);line-height:1.2;margin-bottom:0.5rem;animation:fadeup 0.8s ease forwards;}
+.hero-sub{font-family:var(--display);font-style:italic;font-size:15px;color:var(--text-dim);margin-bottom:1.5rem;animation:fadeup 0.8s ease 0.2s forwards;opacity:0;}
+.hero-mascots{display:flex;justify-content:center;gap:1.5rem;margin:1rem 0 1.5rem;animation:fadeup 0.8s ease 0.4s forwards;opacity:0;}
+.journal-wrap{position:relative;z-index:2;max-width:780px;margin:0 auto;padding:0 2rem 5rem;}
+.book-outer{position:relative;background:#e8dcc8;border-radius:4px 16px 16px 4px;box-shadow:-4px 0 8px rgba(0,0,0,0.08),4px 4px 20px rgba(0,0,0,0.12),0 8px 32px rgba(0,0,0,0.08);}
+.book-spine{position:absolute;top:0;left:0;bottom:0;width:30px;background:linear-gradient(to right,#c9a96e,#dbb97e,#e8cfa0);border-radius:4px 0 0 4px;display:flex;align-items:center;justify-content:center;}
+.spine-text{font-family:var(--hand);font-size:10px;color:#8b6914;writing-mode:vertical-rl;letter-spacing:2px;}
+.book-page{display:none;margin-left:30px;background:#fffef9;border-radius:0 16px 16px 0;padding:2rem 2rem 1.5rem;min-height:580px;position:relative;overflow:hidden;}
+.book-page.active{display:block;animation:pageFlip 0.35s ease;}
+.book-page::after{content:'';position:absolute;top:0;right:0;bottom:0;width:5px;background:linear-gradient(to left,rgba(0,0,0,0.04),transparent);border-radius:0 16px 16px 0;}
+.page-corner{position:absolute;bottom:0;right:0;width:0;height:0;border-style:solid;border-width:0 0 36px 36px;border-color:transparent transparent #e8dcc8 transparent;opacity:0.5;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px dashed rgba(180,83,9,0.2);}
+.page-date{font-family:var(--hand);font-size:14px;color:var(--text-dim);}
+.page-tag{font-family:var(--body);font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:20px;}
+.page-illo{float:right;margin:0 0 1rem 1.25rem;width:130px;}
+.page-illo svg{width:100%;height:auto;}
+.page-title{font-family:var(--hand);font-size:24px;color:var(--text);line-height:1.3;margin-bottom:0.9rem;}
+.page-body{font-family:var(--display);font-size:14px;color:var(--text-dim);line-height:1.85;font-weight:400;}
+.page-body strong{color:var(--text);font-weight:600;}
+.page-body em{color:#a09070;}
+.page-quote{font-family:var(--hand);font-size:17px;margin:1.25rem 0;padding:0.9rem 1.1rem;border-left:3px solid var(--amber);background:rgba(180,83,9,0.04);color:var(--amber);line-height:1.6;clear:both;}
+.page-song{margin-top:1.25rem;clear:both;}
+.song-label{font-family:var(--hand);font-size:12px;color:var(--text-dim);margin-bottom:5px;}
+.page-source{font-family:var(--body);font-size:10px;color:#b0a090;margin-top:0.9rem;padding-top:0.6rem;border-top:1px dashed rgba(180,83,9,0.12);clear:both;}
+.page-num{text-align:center;font-family:var(--hand);font-size:13px;color:#b0a090;margin-top:0.9rem;}
+.book-nav{display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap;}
+.book-btn{font-family:var(--hand);font-size:16px;color:var(--amber);background:var(--bg2);border:1px solid rgba(180,83,9,0.25);padding:7px 22px;border-radius:20px;cursor:pointer;transition:all 0.2s;}
+.book-btn:hover{background:var(--amber);color:white;}
+.book-btn:disabled{color:#ccc;border-color:#eee;background:#fafafa;cursor:not-allowed;}
+.book-progress{font-family:var(--hand);font-size:16px;color:var(--text-dim);min-width:70px;text-align:center;}
+.book-dots{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:0.9rem;max-width:780px;}
+.book-dot{width:8px;height:8px;border-radius:50%;background:#ddd5c0;cursor:pointer;border:none;transition:all 0.2s;}
+.book-dot.active{background:var(--amber);transform:scale(1.3);}
+.book-dot:hover{background:var(--pink);}
+.music-bar{position:fixed;bottom:0;left:0;right:0;z-index:999;background:rgba(250,248,244,0.97);border-top:1px solid var(--border);padding:7px 1.5rem;display:flex;align-items:center;gap:1rem;backdrop-filter:blur(10px);box-shadow:0 -2px 12px rgba(0,0,0,0.06);}
+.music-label{font-family:var(--hand);font-size:13px;color:var(--text-dim);white-space:nowrap;}
+.music-close{font-family:var(--body);font-size:11px;color:#a09070;background:none;border:none;cursor:pointer;padding:4px 8px;white-space:nowrap;}
+@keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pageFlip{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">📖 Elham's Journal</div>
+  <div class="nav-right">
+    <a href="https://elham-alavy.github.io/TodayILearned/" class="nav-link">← TIL</a>
+    <a href="https://elham-alavy.github.io/portfolio" class="nav-link">portfolio</a>
+    <a href="https://github.com/elham-alavy" class="nav-link">github</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1 class="hero-title">📖 Elham's Journal</h1>
+  <p class="hero-sub">things that stayed with me — لحظاتی که موندن</p>
+  <p style="font-family:var(--display);font-style:italic;font-size:14px;color:var(--text-dim);line-height:1.8;max-width:500px;margin:0 auto 1.5rem;border-left:2px solid var(--pink);padding-left:1rem;text-align:left;">
+    💌 To all girls who are way younger than me,<br>
+    and all girls who are way older than me —<br>
+    but keep alive their inner cute child,<br>
+    as I do. 🐰
+  </p>
+  <div class="hero-mascots">
+    <svg width="65" height="72" viewBox="0 0 80 85"><style>.re{transform-origin:24px 18px;animation:eW 2s ease-in-out infinite}.re2{transform-origin:52px 18px;animation:eW 2s ease-in-out infinite .2s}.rh{animation:bH 2.5s ease-in-out infinite}.rel{animation:bR 4s ease-in-out infinite;transform-origin:30px 52px}.rer{animation:bR 4s ease-in-out infinite .1s;transform-origin:46px 52px}@keyframes eW{0%,100%{transform:rotate(0)}30%{transform:rotate(-10deg)}65%{transform:rotate(7deg)}}@keyframes bH{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes bR{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(0.08)}}</style><g class="re"><ellipse cx="24" cy="20" rx="8" ry="20" fill="#faf8f4" stroke="#c2185b" stroke-width="1.5"/><ellipse cx="24" cy="20" rx="4.5" ry="14" fill="#ffb3c6"/></g><g class="re2"><ellipse cx="52" cy="20" rx="8" ry="20" fill="#faf8f4" stroke="#c2185b" stroke-width="1.5"/><ellipse cx="52" cy="20" rx="4.5" ry="14" fill="#ffb3c6"/></g><g class="rh"><circle cx="38" cy="56" r="24" fill="#faf8f4" stroke="#c2185b" stroke-width="1.5"/><g class="rel"><circle cx="30" cy="52" r="4.5" fill="#2d2a24"/><circle cx="31.5" cy="50.5" r="1.3" fill="white"/></g><g class="rer"><circle cx="46" cy="52" r="4.5" fill="#2d2a24"/><circle cx="47.5" cy="50.5" r="1.3" fill="white"/></g><ellipse cx="38" cy="59" rx="3.5" ry="2.5" fill="#c2185b"/><path d="M34 63 Q38 67 42 63" fill="none" stroke="#c2185b" stroke-width="1.3" stroke-linecap="round"/><circle cx="24" cy="59" r="5.5" fill="#ffb3c6" opacity="0.45"/><circle cx="52" cy="59" r="5.5" fill="#ffb3c6" opacity="0.45"/></g></svg>
+    <svg width="70" height="72" viewBox="0 0 85 85"><style>.be{transform-origin:18px 20px;animation:bE 3s ease-in-out infinite}.be2{transform-origin:62px 20px;animation:bE 3s ease-in-out infinite .4s}.bh{animation:bB 3s ease-in-out infinite .5s}.bel{animation:bL 5s ease-in-out infinite;transform-origin:30px 46px}.ber{animation:bL 5s ease-in-out infinite .2s;transform-origin:50px 46px}@keyframes bE{0%,100%{transform:rotate(0)}50%{transform:rotate(-8deg)}}@keyframes bB{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes bL{0%,85%,100%{transform:scaleY(1)}91%{transform:scaleY(0.08)}}</style><g class="be"><circle cx="18" cy="22" r="13" fill="#b45309"/><circle cx="18" cy="22" r="8" fill="#e3b341"/></g><g class="be2"><circle cx="62" cy="22" r="13" fill="#b45309"/><circle cx="62" cy="22" r="8" fill="#e3b341"/></g><g class="bh"><circle cx="40" cy="50" r="28" fill="#b45309"/><ellipse cx="40" cy="62" rx="13" ry="10" fill="#e3b341"/><g class="bel"><circle cx="30" cy="46" r="5" fill="#2d2a24"/><circle cx="31.5" cy="44.5" r="1.5" fill="white"/></g><g class="ber"><circle cx="50" cy="46" r="5" fill="#2d2a24"/><circle cx="51.5" cy="44.5" r="1.5" fill="white"/></g><ellipse cx="40" cy="57" rx="4" ry="3" fill="#2d2a24"/><path d="M36 63 Q40 68 44 63" fill="none" stroke="#2d2a24" stroke-width="1.5" stroke-linecap="round"/><circle cx="26" cy="58" r="7" fill="#e3b341" opacity="0.35"/><circle cx="54" cy="58" r="7" fill="#e3b341" opacity="0.35"/></g></svg>
+    <div style="font-family:var(--hand);font-size:14px;color:var(--text-dim);align-self:center;line-height:1.7;">my always friends<br>from childhood 💙</div>
+  </div>
+</div>
+
+<div class="journal-wrap">
+<div class="book-outer">
+<div class="book-spine"><span class="spine-text">Elham's Journal · لحظاتی که موندن</span></div>
+
+<!-- PAGE 1 — MOM AT AIRPORT -->
+<div class="book-page active" id="jp-0">
+  <div class="page-header"><span class="page-date">Tehran Airport · 3:00 AM 🛫</span><span class="page-tag" style="background:rgba(194,24,91,0.08);color:#c2185b;">mom ❤️</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="8" y="8" width="114" height="134" rx="8" fill="#e8f0fe" stroke="#1a56a0" stroke-width="1.5"/><rect x="18" y="18" width="94" height="76" rx="4" fill="#1a237e" opacity="0.85"/><circle cx="35" cy="38" r="2" fill="white" opacity="0.9"/><circle cx="65" cy="28" r="1.5" fill="white" opacity="0.7"/><circle cx="95" cy="42" r="2" fill="white" opacity="0.8"/><circle cx="50" cy="58" r="1" fill="white" opacity="0.6"/><circle cx="80" cy="52" r="1.5" fill="white" opacity="0.9"/><circle cx="85" cy="38" r="10" fill="#fff9c4"/><circle cx="90" cy="35" r="7" fill="#1a237e" opacity="0.75"/><circle cx="48" cy="118" r="8" fill="#ffb3c6"/><circle cx="48" cy="108" r="5" fill="#f06292"/><circle cx="41" cy="113" r="5" fill="#f48fb1"/><circle cx="55" cy="113" r="5" fill="#f48fb1"/><circle cx="48" cy="113" r="4" fill="#fff"/><line x1="48" y1="126" x2="48" y2="140" stroke="#2d7a3a" stroke-width="2"/><text x="82" y="122" font-family="Caveat" font-size="14" fill="#c2185b" text-anchor="middle">3 AM ✈️</text><text x="82" y="140" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">Tehran 🌸</text></svg></div>
+  <h2 class="page-title">My mom's advice at the airport 💙</h2>
+  <div class="page-body">The hardest goodbye. She held my face and said things I didn't understand then — but understand completely now.<br><br><strong>"Wherever you live in the world, you must respect the rules of that place."</strong><br><br>And then quietly: <strong>"Buy yourself flowers, Elham. 🌸"</strong><br><br><em>Because you meet yourself in the mirror every day — and you are the most important person to you.</em><br><br><strong>"Do not permit anybody to hurt or question your self-esteem."</strong><br><br>Build your own empire — even with a small crown. 👑 Dress well always.</div>
+  <div class="page-quote">"My mom was always right. She just knew I had to live it to believe it." 💙</div>
+  <div class="page-song"><div class="song-label">🎵 Clair de Lune · Debussy</div><iframe src="https://open.spotify.com/embed/track/5XpSLMi7SOfMoWXCLklCOH?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">mom's advice · Tehran Airport · 3AM 💙</div>
+  <div class="page-num">— 1 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 2 — FAKE FRIENDS -->
+<div class="book-page" id="jp-1">
+  <div class="page-header"><span class="page-date">December 14, 2025 · 5:06 PM</span><span class="page-tag" style="background:rgba(109,40,217,0.08);color:#6d28d9;">note to self 💙</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><circle cx="42" cy="48" r="15" fill="#2d7a3a" opacity="0.8"/><rect x="30" y="63" width="24" height="38" rx="5" fill="#2d7a3a" opacity="0.7"/><text x="35" y="53" font-size="13" fill="white">💚</text><circle cx="92" cy="48" r="15" fill="#888" opacity="0.25"/><rect x="80" y="63" width="24" height="38" rx="5" fill="#888" opacity="0.2"/><line x1="76" y1="34" x2="108" y2="88" stroke="#c2185b" stroke-width="2.5" opacity="0.7"/><line x1="108" y1="34" x2="76" y2="88" stroke="#c2185b" stroke-width="2.5" opacity="0.7"/><text x="65" y="118" font-family="Caveat" font-size="12" fill="#6d28d9" text-anchor="middle">choose people</text><text x="65" y="133" font-family="Caveat" font-size="12" fill="#6d28d9" text-anchor="middle">who choose</text><text x="65" y="148" font-family="Caveat" font-size="13" text-anchor="middle">you back 💙</text></svg></div>
+  <h2 class="page-title">Fake friends — a note to self 💙</h2>
+  <div class="page-body">Life is too short to spend time with people who secretly hope you fail.<br><br>They ask about your promotion with fake concern. They go silent when good things happen. They always have a 'but' after congratulations.<br><br><strong>Choose people who:</strong><br>— Celebrate your wins like their own<br>— Defend you in rooms you're not in<br>— Actually want you to succeed<br><br>Your circle should <strong>expand your possibilities</strong>, not shrink them.<br><br><em>It's not mean to cut people off. It's mean to yourself not to.</em></div>
+  <div class="page-quote">"Choose people who choose you back." 💙</div>
+  <div class="page-song"><div class="song-label">🎵 Gymnopédie No.1 · Satie</div><iframe src="https://open.spotify.com/embed/track/5NGtFXVpXSvwunEIGeviY3?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">note to self · email to elhamhasanialavy · 12/14/25</div>
+  <div class="page-num">— 2 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 3 — SURVIVE ALONE -->
+<div class="book-page" id="jp-2">
+  <div class="page-header"><span class="page-date">December 30, 2025 · 11:46 PM</span><span class="page-tag" style="background:rgba(45,122,58,0.08);color:#2d7a3a;">survival 💪</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><circle cx="65" cy="45" r="25" fill="#2d7a3a" opacity="0.15" stroke="#2d7a3a" stroke-width="2"/><circle cx="65" cy="45" r="16" fill="#2d7a3a" opacity="0.3"/><circle cx="65" cy="45" r="8" fill="#2d7a3a" opacity="0.6"/><text x="65" y="50" font-size="10" fill="white" text-anchor="middle">YOU</text><line x1="65" y1="70" x2="65" y2="100" stroke="#2d7a3a" stroke-width="2.5"/><line x1="50" y1="82" x2="80" y2="82" stroke="#2d7a3a" stroke-width="2.5"/><ellipse cx="52" cy="115" rx="8" ry="4" fill="#2d7a3a" opacity="0.5"/><ellipse cx="78" cy="115" rx="8" ry="4" fill="#2d7a3a" opacity="0.5"/><text x="65" y="135" font-family="Caveat" font-size="13" fill="#2d7a3a" text-anchor="middle">stand alone</text><text x="65" y="150" font-family="Caveat" font-size="13" fill="#2d7a3a" text-anchor="middle">stand strong 💪</text></svg></div>
+  <h2 class="page-title">Always be ready to survive alone 💪</h2>
+  <div class="page-body"><strong>"Today you are important to them, tomorrow you are nothing to them — and that's real life."</strong><br><br>People come and go.<br>The only constant is you.<br><br>Be your own home first.<br><br>Independence is not loneliness — it is freedom.</div>
+  <div class="page-quote">"Today I learned that independence is not loneliness — it is freedom." 💪</div>
+  <div class="page-song"><div class="song-label">🎵 River Flows in You · Yiruma</div><iframe src="https://open.spotify.com/embed/track/3TGHJHqXBCgGkFiMJBCsmx?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">personal note · 12/30/25</div>
+  <div class="page-num">— 3 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 4 — WORK HARD -->
+<div class="book-page" id="jp-3">
+  <div class="page-header"><span class="page-date">December 30, 2025 · 11:48 PM</span><span class="page-tag" style="background:rgba(45,122,58,0.08);color:#2d7a3a;">work 🎯</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="20" y="20" width="90" height="110" rx="6" fill="#fff9e6" stroke="#b45309" stroke-width="1.5"/><text x="65" y="55" font-family="Caveat" font-size="14" fill="#b45309" text-anchor="middle">Dress good.</text><text x="65" y="73" font-family="Caveat" font-size="14" fill="#b45309" text-anchor="middle">Eat well.</text><text x="65" y="91" font-family="Caveat" font-size="14" fill="#b45309" text-anchor="middle">Talk less.</text><text x="65" y="109" font-family="Caveat" font-size="14" fill="#2d7a3a" text-anchor="middle">Stay humble.</text><text x="65" y="127" font-family="Caveat" font-size="13" fill="#c2185b" text-anchor="middle">Chase goals!</text><text x="65" y="143" font-size="16" text-anchor="middle">🎯</text></svg></div>
+  <h2 class="page-title">Work hard while... 🎯</h2>
+  <div class="page-body">Dress good.<br>Eat well.<br>Talk less.<br>Stay humble.<br>Avoid drama.<br><br><strong>Chase goals :)))))))))))))))</strong><br><br><em>The quietest people are often building the loudest futures.</em></div>
+  <div class="page-quote">"The quietest people are often building the loudest futures." 🎯</div>
+  <div class="page-song"><div class="song-label">🎵 Experience · Ludovico Einaudi</div><iframe src="https://open.spotify.com/embed/track/1BncfTMTXPY42OFPqSaZ5p?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">personal note · 12/30/25</div>
+  <div class="page-num">— 4 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 5 — CHARLIE BROWN -->
+<div class="book-page" id="jp-4">
+  <div class="page-header"><span class="page-date">December 31, 2025 · 12:02 AM</span><span class="page-tag" style="background:rgba(26,86,160,0.08);color:#1a56a0;">life 🎣</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="8" y="8" width="114" height="134" rx="6" fill="#e3f2fd" stroke="#1a56a0" stroke-width="1"/><circle cx="32" cy="25" r="3" fill="white" opacity="0.8"/><circle cx="55" cy="18" r="2" fill="white" opacity="0.6"/><circle cx="90" cy="22" r="3" fill="white" opacity="0.7"/><circle cx="105" cy="30" r="2" fill="white" opacity="0.6"/><ellipse cx="65" cy="90" rx="50" ry="10" fill="white" opacity="0.4"/><circle cx="65" cy="75" r="18" fill="#f5deb3" stroke="#b45309" stroke-width="1"/><text x="65" y="80" font-size="14" fill="#b45309" text-anchor="middle">🙂</text><line x1="65" y1="93" x2="65" y2="130" stroke="#b45309" stroke-width="2"/><line x1="65" y1="105" x2="50" y2="118" stroke="#b45309" stroke-width="1.5"/><line x1="65" y1="105" x2="80" y2="118" stroke="#b45309" stroke-width="1.5"/><line x1="65" y1="93" x2="90" y2="108" stroke="#b45309" stroke-width="1.5"/><text x="65" y="148" font-family="Caveat" font-size="11" fill="#1a56a0" text-anchor="middle">fishing in snow ❄️</text></svg></div>
+  <h2 class="page-title">Life is a one-time offer 🎣</h2>
+  <div class="page-body">Life is short. <strong>Stop worrying so much.</strong><br><br>Have fun.<br>Be grateful.<br>Be yourself.<br>Don't allow others to bring you down.<br><br><strong>Life is a one-time offer.</strong><br>Live life to the fullest. 🌟<br><br><em>Charlie Brown knows. He fishes in the snow and smiles anyway.</em></div>
+  <div class="page-quote">"Worrying is paying interest on a debt you may never owe." 🎣</div>
+  <div class="page-song"><div class="song-label">🎵 Moonlight Sonata · Beethoven</div><iframe src="https://open.spotify.com/embed/track/3dBVyJ7Dpx1JFVfQXmT6bZ?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">Charlie Brown · saved · 12/31/25 · 12:02 AM</div>
+  <div class="page-num">— 5 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 6 — 10 YEARS LATER -->
+<div class="book-page" id="jp-5">
+  <div class="page-header"><span class="page-date">December 31, 2025 · 12:19 AM</span><span class="page-tag" style="background:rgba(194,24,91,0.08);color:#c2185b;">letter to self 💙</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="15" y="20" width="100" height="80" rx="4" fill="#e8f5e9"/><rect x="15" y="20" width="100" height="80" rx="4" fill="none" stroke="#2d7a3a" stroke-width="1.5"/><path d="M15 20 L65 55 L115 20" fill="none" stroke="#2d7a3a" stroke-width="1.5"/><text x="65" y="75" font-family="Caveat" font-size="12" fill="#2d7a3a" text-anchor="middle">Dear future Elham,</text><text x="65" y="90" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">ازت ممنونم 💙</text><text x="30" y="130" font-size="24" text-anchor="middle">👧</text><text x="100" y="130" font-size="24" text-anchor="middle">👵</text><text x="65" y="125" font-size="18" text-anchor="middle">💌</text><text x="65" y="148" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">age 10 → you ← age 80</text></svg></div>
+  <h2 class="page-title">10 years later — what your 10-year-old self would say 💙</h2>
+  <div class="page-body">می‌دونی خود ده سال دیگه‌ات چی می‌گفت؟<br><br>«به خاطر تمام امیدهایی که بهم دادی، به خاطر تمام تلاش‌هایی که کردی، و به خاطر تسلیم نشدنت — امروز من به اینجا رسیدم. ازت ممنونم و خیلی دوستت دارم.»<br><br><em>"Because of all the hope you gave me, because of all the hard work you put in — I am here today. Thank you, and I love you so much."</em></div>
+  <div class="page-quote">"The little version of me is proud — and that is enough." 💙</div>
+  <div class="page-song"><div class="song-label">🎵 Nuvole Bianche · Ludovico Einaudi</div><iframe src="https://open.spotify.com/embed/track/6f5FWvSrEqO2v7H2a4IBZG?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">personal note · 12/31/25 · 12:19 AM</div>
+  <div class="page-num">— 6 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 7 — UNCLE ADVICE -->
+<div class="book-page" id="jp-6">
+  <div class="page-header"><span class="page-date">December 31, 2025 · 12:37 AM</span><span class="page-tag" style="background:rgba(180,83,9,0.08);color:#b45309;">family wisdom 💛</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="15" y="15" width="100" height="120" rx="3" fill="#fff9e6" stroke="#b45309" stroke-width="1.5"/><text x="20" y="38" font-family="Caveat" font-size="11" fill="#8b6914">١ — move slowly</text><text x="20" y="56" font-family="Caveat" font-size="11" fill="#8b6914">٢ — speak less</text><text x="20" y="74" font-family="Caveat" font-size="11" fill="#8b6914">٣ — keep your word</text><text x="20" y="92" font-family="Caveat" font-size="11" fill="#8b6914">٤ — be consistent</text><text x="20" y="110" font-family="Caveat" font-size="11" fill="#8b6914">٥ — save money</text><text x="20" y="128" font-family="Caveat" font-size="11" fill="#2d7a3a">٦ — write your goals</text><circle cx="95" cy="118" r="16" fill="#e3b341" opacity="0.3" stroke="#b45309" stroke-width="1"/><text x="95" y="123" font-size="14" text-anchor="middle">💛</text></svg></div>
+  <h2 class="page-title">My uncle's advice — 2025 💛</h2>
+  <div class="page-body"><em>آخرین سال و آخرین فرصت برای خودسازی</em><br><br><strong>1.</strong> Move slowly. Very slowly.<br><strong>2.</strong> Speak less — only when truly necessary.<br><strong>3.</strong> Take care of yourself. Don't let others dominate you.<br><strong>4.</strong> Be consistent. Follow through on everything.<br><strong>5.</strong> Always keep your word.<br><strong>6.</strong> Be extraordinarily kind and patient with your spouse.<br><strong>7.</strong> Be completely honest.<br><strong>8.</strong> Save money — as much as you possibly can.<br><strong>9.</strong> Write down your goals...</div>
+  <div class="page-quote">"The wisest advice comes handwritten, from someone who has already lived it." 💛</div>
+  <div class="page-song"><div class="song-label">🎵 Divenire · Ludovico Einaudi</div><iframe src="https://open.spotify.com/embed/track/3JM5IKN1bTyoFWqYJCuMlq?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">my uncle's handwritten advice · 12/31/25 · 12:37 AM</div>
+  <div class="page-num">— 7 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 8 — UNCLE MUSIC MEMORY -->
+<div class="book-page" id="jp-7">
+  <div class="page-header"><span class="page-date">یه روز... a day 🎵</span><span class="page-tag" style="background:rgba(180,83,9,0.08);color:#b45309;">memory 💛</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><text x="18" y="38" font-size="20" fill="#e3b341" opacity="0.8">♪</text><text x="75" y="25" font-size="16" fill="#b45309" opacity="0.7">♫</text><text x="105" y="50" font-size="13" fill="#e3b341" opacity="0.6">♩</text><text x="12" y="75" font-size="15" fill="#b45309" opacity="0.5">♬</text><text x="95" y="85" font-size="18" fill="#e3b341" opacity="0.8">♪</text><rect x="18" y="90" width="94" height="50" rx="4" fill="#fff3e0" stroke="#b45309" stroke-width="1"/><circle cx="40" cy="107" r="8" fill="#b45309" opacity="0.7"/><rect x="32" y="115" width="16" height="22" rx="3" fill="#b45309" opacity="0.6"/><circle cx="90" cy="105" r="9" fill="#c2185b" opacity="0.7"/><rect x="81" y="114" width="16" height="23" rx="3" fill="#c2185b" opacity="0.6"/><text x="65" y="115" font-size="14" text-anchor="middle">💛</text><text x="65" y="148" font-family="Caveat" font-size="11" fill="#b45309" text-anchor="middle">I will always remember</text></svg></div>
+  <h2 class="page-title">The loveliest uncle in the world played music for me 🎵</h2>
+  <div class="page-body"><em>یه روزی... a day...</em><br><br>My uncle — <strong>the loveliest uncle in the world</strong> — played music for me.<br><br>I remember it.<br>I remember exactly how it felt.<br>The room. The sound. Him.<br><br><strong>YES — the loveliest uncle in the world. YES.</strong> 💛<br><br>Some moments just live in your chest — warm, quiet, forever.</div>
+  <div class="page-quote">"The most precious memories are the ones that need no explanation — they just glow." 💛</div>
+  <div class="page-song"><div class="song-label">🎵 The Scientist (piano) · Coldplay</div><iframe src="https://open.spotify.com/embed/track/0ofHAoxe9vBkTCp2UQIavz?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">a memory · always in my heart 💛</div>
+  <div class="page-num">— 8 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 9 — BE PRIVATE MOON -->
+<div class="book-page" id="jp-8">
+  <div class="page-header"><span class="page-date">December 31, 2025 · 12:57 AM</span><span class="page-tag" style="background:rgba(26,86,160,0.08);color:#1a56a0;">future self 🌙</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="8" y="8" width="114" height="96" rx="6" fill="#0d1b4b"/><circle cx="32" cy="28" r="1.5" fill="white" opacity="0.9"/><circle cx="58" cy="20" r="1" fill="white" opacity="0.7"/><circle cx="90" cy="32" r="2" fill="white" opacity="0.8"/><circle cx="105" cy="22" r="1.5" fill="white" opacity="0.9"/><circle cx="70" cy="52" r="26" fill="#fff9c4"/><circle cx="80" cy="46" r="20" fill="#0d1b4b"/><text x="65" y="120" font-family="Caveat" font-size="15" fill="#1a56a0" text-anchor="middle">Be private,</text><text x="65" y="137" font-family="Caveat" font-size="15" fill="#1a56a0" text-anchor="middle">vibe alone,</text><text x="65" y="150" font-family="Caveat" font-size="13" fill="#6b6560" text-anchor="middle">grow in silence 🌙</text></svg></div>
+  <h2 class="page-title">Be private, vibe alone, grow in silence 🌙</h2>
+  <div class="page-body">A letter from the Elham of the past — to the Elham of the future.<br><br>Whatever you are going through, she believed in you completely. She still does.<br><br><strong style="font-size:19px;line-height:2;">"Be private,<br>vibe alone,<br>grow in silence."</strong><br><br>🌙 The moon doesn't explain itself. It just shines.<br><br>Not everyone needs to see your process. Just trust it.</div>
+  <div class="page-quote">"Dear future Elham — not everyone needs to see your process. Just trust it." 🌙</div>
+  <div class="page-song"><div class="song-label">🎵 Gymnopédie No.1 · Satie</div><iframe src="https://open.spotify.com/embed/track/5NGtFXVpXSvwunEIGeviY3?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">advice from my past self · 12/31/25 · 12:57 AM</div>
+  <div class="page-num">— 9 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 10 — LIFE DOESN'T GIVE -->
+<div class="book-page" id="jp-9">
+  <div class="page-header"><span class="page-date">December 31, 2025 · 1:20 AM</span><span class="page-tag" style="background:rgba(45,122,58,0.08);color:#2d7a3a;">growth 🌱</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><ellipse cx="52" cy="38" rx="32" ry="20" fill="#90a4ae"/><ellipse cx="38" cy="46" rx="20" ry="14" fill="#90a4ae"/><ellipse cx="68" cy="44" rx="18" ry="12" fill="#78909c"/><path d="M52 53 L44 70 L52 68 L42 88" fill="none" stroke="#ffcc02" stroke-width="2.5"/><line x1="65" y1="148" x2="65" y2="98" stroke="#2d7a3a" stroke-width="3"/><ellipse cx="65" cy="93" rx="16" ry="9" fill="#2d7a3a" opacity="0.8" transform="rotate(-20 65 93)"/><ellipse cx="65" cy="86" rx="13" ry="7" fill="#4caf50" opacity="0.9" transform="rotate(15 65 86)"/><ellipse cx="65" cy="79" rx="10" ry="6" fill="#66bb6a" transform="rotate(-10 65 79)"/><text x="95" y="118" font-family="Caveat" font-size="12" fill="#2d7a3a">THIS IS</text><text x="95" y="133" font-family="Caveat" font-size="12" fill="#2d7a3a">GROWTH</text><text x="95" y="148" font-size="14">🌱</text></svg></div>
+  <h2 class="page-title">Life does not always give you what you want 🌱</h2>
+  <div class="page-body">Sometimes it gives you what you <strong>need</strong> — so that you finally wake up.<br><br>You Lose: to understand the value.<br>You Fall: to learn to get up.<br>You Are Left Alone: to see who you are without everyone.<br><br><strong>IT HURTS, YES!!!!!!!!!!!</strong><br>BUT — <strong>THIS IS GROWTH.</strong><br>AND — <strong>its all for a REASON :))))))))))</strong></div>
+  <div class="page-quote">"Pain is not punishment — it is information." 🌱</div>
+  <div class="page-song"><div class="song-label">🎵 River Flows in You · Yiruma</div><iframe src="https://open.spotify.com/embed/track/3TGHJHqXBCgGkFiMJBCsmx?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">personal note · 12/31/25 · 1:20 AM</div>
+  <div class="page-num">— 10 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 11 — NEXT CHAPTER 2026 -->
+<div class="book-page" id="jp-10">
+  <div class="page-header"><span class="page-date">December 31, 2025 · 2:22 AM</span><span class="page-tag" style="background:rgba(45,122,58,0.08);color:#2d7a3a;">next chapter 🌟</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="8" y="75" width="114" height="67" rx="0" fill="#fff3e0"/><rect x="8" y="8" width="114" height="72" rx="6" fill="#1a237e" opacity="0.6"/><circle cx="65" cy="78" r="30" fill="#ffcc02" opacity="0.9"/><text x="65" y="86" font-family="Caveat" font-size="19" fill="#b45309" text-anchor="middle" font-weight="bold">2026</text><text x="65" y="118" font-family="Caveat" font-size="14" fill="#2d7a3a" text-anchor="middle">I'm ready! 🌟</text><text x="65" y="138" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">Healthy · Wealthy</text><text x="65" y="152" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">Happy · Blessed ✨</text></svg></div>
+  <h2 class="page-title">Next chapter — 2026 🌟</h2>
+  <div class="page-body">فصل بعدی زندگی من «سالم، ثروتمند، شاد و خوشبخت» نام دارد.<br>سال ۲۰۲۶ عزیزا من آماده‌ام.<br><br><strong>"The next chapter of my life is called:<br>Healthy, Wealthy, Happy &amp; Blessed."</strong><br><br>Dear 2026 — I'm ready.<br><em>Send this to yourself immediately.</em> 💌<br><br>The sunrise doesn't ask for permission. Neither should you.</div>
+  <div class="page-quote">"فوزا این را برای خودت بفرست — send this to yourself, Elham." 🌟</div>
+  <div class="page-song"><div class="song-label">🎵 Experience · Ludovico Einaudi</div><iframe src="https://open.spotify.com/embed/track/1BncfTMTXPY42OFPqSaZ5p?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">personal note · 12/31/25 · 2:22 AM</div>
+  <div class="page-num">— 11 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 12 — NEVER OUTSHINE -->
+<div class="book-page" id="jp-11">
+  <div class="page-header"><span class="page-date">January 1, 2026 · 12:00 AM</span><span class="page-tag" style="background:rgba(109,40,217,0.08);color:#6d28d9;">power 🧠</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><circle cx="65" cy="40" r="28" fill="#6d28d9" opacity="0.15" stroke="#6d28d9" stroke-width="1.5" stroke-dasharray="5,3"/><text x="65" y="46" font-size="28" text-anchor="middle">👑</text><text x="65" y="85" font-family="Caveat" font-size="12" fill="#6d28d9" text-anchor="middle">Never outshine</text><text x="65" y="100" font-family="Caveat" font-size="12" fill="#6d28d9" text-anchor="middle">the master</text><rect x="20" y="112" width="90" height="32" rx="4" fill="#6d28d9" opacity="0.08" stroke="#6d28d9" stroke-width="1"/><text x="65" y="125" font-family="Caveat" font-size="11" fill="#6d28d9" text-anchor="middle">be strategically</text><text x="65" y="140" font-family="Caveat" font-size="11" fill="#6d28d9" text-anchor="middle">wise 🧠</text></svg></div>
+  <h2 class="page-title">Never outshine your master 🧠</h2>
+  <div class="page-body">From The 48 Laws of Power — <strong>"Never outshine the master"</strong> is the first law.<br><br>Make them look good.<br>Control your brilliance.<br>Align your goals so your success feels like a reflection of theirs.<br><br>Not about shrinking yourself — about being <strong>strategically wise</strong>.<br><br><em>Intelligence without strategy is just noise.</em></div>
+  <div class="page-quote">"Intelligence without strategy is just noise." 🧠</div>
+  <div class="page-song"><div class="song-label">🎵 Experience · Ludovico Einaudi</div><iframe src="https://open.spotify.com/embed/track/1BncfTMTXPY42OFPqSaZ5p?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">48 Laws of Power · 1/1/26</div>
+  <div class="page-num">— 12 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 13 — SAY NO -->
+<div class="book-page" id="jp-12">
+  <div class="page-header"><span class="page-date">January 27, 2026</span><span class="page-tag" style="background:rgba(194,24,91,0.08);color:#c2185b;">boundaries 🚫</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><circle cx="65" cy="55" r="38" fill="#c2185b" opacity="0.08" stroke="#c2185b" stroke-width="2"/><text x="65" y="68" font-family="Caveat" font-size="48" fill="#c2185b" text-anchor="middle" font-weight="bold">NO</text><text x="65" y="110" font-family="Caveat" font-size="12" fill="#c2185b" text-anchor="middle">every NO is a</text><text x="65" y="126" font-family="Caveat" font-size="12" fill="#c2185b" text-anchor="middle">PROTECTION 🛡️</text><text x="65" y="148" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">every YES is an adaptation</text></svg></div>
+  <h2 class="page-title">NO — the most powerful word 🚫</h2>
+  <div class="page-body">No to invitations that steal your focus.<br>No to relationships that drain your energy.<br>No to environments that shrink your vision.<br>No to habits that slow your momentum.<br><br><strong>Because every YES is an ADAPTATION.<br>And every NO is a PROTECTION.</strong><br><br><em>NO is not a rejection — it is a direction.</em></div>
+  <div class="page-quote">"NO is not a rejection — it is a direction." 🚫</div>
+  <div class="page-song"><div class="song-label">🎵 Nuvole Bianche · Ludovico Einaudi</div><iframe src="https://open.spotify.com/embed/track/6f5FWvSrEqO2v7H2a4IBZG?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">personal note · 1/27/26</div>
+  <div class="page-num">— 13 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 14 — THERE WILL ALWAYS BE ANOTHER -->
+<div class="book-page" id="jp-13">
+  <div class="page-header"><span class="page-date">February 20, 2026</span><span class="page-tag" style="background:rgba(26,86,160,0.08);color:#1a56a0;">life 🌅</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="8" y="70" width="114" height="72" rx="0" fill="#fff3e0"/><rect x="8" y="8" width="114" height="68" rx="6" fill="#ff8a65" opacity="0.4"/><circle cx="65" cy="72" r="28" fill="#ffcc02" opacity="0.85"/><text x="65" y="118" font-family="Caveat" font-size="13" fill="#b45309" text-anchor="middle">start again</text><text x="65" y="135" font-family="Caveat" font-size="13" fill="#b45309" text-anchor="middle">🌅</text><text x="65" y="152" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">choosing yourself again</text></svg></div>
+  <h2 class="page-title">There will always be another... 🌅</h2>
+  <div class="page-body"><em>"There will always be another love, another job, another city, other people — but never another life."</em><br><br><strong>Don't be afraid to start again.</strong><br><br>Starting over is not losing — it is choosing yourself again.<br><br>The sunrise comes every morning without asking permission. So can you.</div>
+  <div class="page-quote">"Starting over is not losing — it is choosing yourself again." 🌅</div>
+  <div class="page-song"><div class="song-label">🎵 Clair de Lune · Debussy</div><iframe src="https://open.spotify.com/embed/track/5XpSLMi7SOfMoWXCLklCOH?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">personal note · 2/20/26</div>
+  <div class="page-num">— 14 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 15 — TWO PEOPLE TO MAKE PROUD -->
+<div class="book-page" id="jp-14">
+  <div class="page-header"><span class="page-date">February 11, 2026</span><span class="page-tag" style="background:rgba(194,24,91,0.08);color:#c2185b;">درس امروز 💙</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><circle cx="35" cy="45" r="14" fill="#ffb3c6"/><path d="M23 59 L23 89 L47 89 L47 59Z" fill="#f06292" opacity="0.8"/><text x="32" y="50" font-size="11" fill="white">⭐</text><text x="48" y="38" font-size="10" fill="#ff9800">✨</text><circle cx="95" cy="43" r="14" fill="#ffe0b2"/><rect x="83" y="57" width="24" height="32" rx="4" fill="#ffcc02" opacity="0.7"/><text x="88" y="38" font-size="10" fill="#6d28d9">📖</text><text x="103" y="32" font-size="10" fill="#1a56a0">💭</text><circle cx="65" cy="65" r="16" fill="#b45309" opacity="0.1" stroke="#b45309" stroke-width="1.5" stroke-dasharray="4,3"/><text x="65" y="70" font-family="Caveat" font-size="10" fill="#b45309" text-anchor="middle">you</text><text x="35" y="102" font-family="Caveat" font-size="10" fill="#c2185b" text-anchor="middle">age 10</text><text x="95" y="102" font-family="Caveat" font-size="10" fill="#6b6560" text-anchor="middle">age 80</text><text x="65" y="128" font-family="Caveat" font-size="12" fill="#b45309" text-anchor="middle">make both proud 💙</text></svg></div>
+  <h2 class="page-title">Two people to make proud 💙</h2>
+  <div class="page-body">In this world there are only <strong>two people</strong> you need to make proud.<br>Not your parents. Not your spouse. Not your children.<br><br><strong>First</strong> — your 10-year-old self, who had all the dreams.<br><strong>Second</strong> — your 80-year-old self, who will have all the memories.<br><br>If these two are satisfied — you went the right way.<br><br><em>"I lived the life my heart wanted."</em></div>
+  <div class="page-quote">"The only two judges that matter are the child I was and the elder I will become." 💙</div>
+  <div class="page-song"><div class="song-label">🎵 Divenire · Ludovico Einaudi</div><iframe src="https://open.spotify.com/embed/track/3JM5IKN1bTyoFWqYJCuMlq?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">درس امروز · my friend's advice, Mona · 2/11/26</div>
+  <div class="page-num">— 15 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 16 — EMOTIONAL PLAYLIST -->
+<div class="book-page" id="jp-15">
+  <div class="page-header"><span class="page-date">March 1, 2026 · 9:56 PM</span><span class="page-tag" style="background:rgba(194,24,91,0.08);color:#c2185b;">mindset 🎵</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><text x="20" y="35" font-size="18" fill="#e3b341" opacity="0.8">♪</text><text x="75" y="22" font-size="15" fill="#c2185b" opacity="0.7">♫</text><text x="105" y="45" font-size="13" fill="#e3b341" opacity="0.6">♩</text><text x="12" y="72" font-size="15" fill="#c2185b" opacity="0.5">♬</text><text x="95" y="82" font-size="18" fill="#e3b341" opacity="0.8">♪</text><rect x="20" y="90" width="90" height="55" rx="6" fill="#fff0f5" stroke="#c2185b" stroke-width="1"/><text x="65" y="108" font-family="Caveat" font-size="12" fill="#c2185b" text-anchor="middle">Your people =</text><text x="65" y="124" font-family="Caveat" font-size="12" fill="#c2185b" text-anchor="middle">Your playlist</text><text x="65" y="142" font-size="16" text-anchor="middle">🎵</text></svg></div>
+  <h2 class="page-title">Change your emotional playlist 🎵</h2>
+  <div class="page-body"><strong>"Change of Emotional Memory means changing the emotional playlist inside yourself!"</strong><br><br>«تو میانگین ۵ نفری هستی که بیشترین وقت رو باهاشون می‌گذرونی»<br><br>My current 5:<br>1 — Torange · 2 — Professor Hesabi<br>3 — Pursuit of Happiness<br>4 — ?? · 5 — ??<br><br><em>"A scriptwriter: I create a blueprint for the character I want to become..."</em></div>
+  <div class="page-quote">"Who I spend time with IS my emotional playlist — and I can change it." 🎵</div>
+  <div class="page-song"><div class="song-label">🎵 River Flows in You · Yiruma</div><iframe src="https://open.spotify.com/embed/track/3TGHJHqXBCgGkFiMJBCsmx?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">voice recording · 3/1/26 · 9:56 PM</div>
+  <div class="page-num">— 16 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 17 — BOUNDARIES BOOK -->
+<div class="book-page" id="jp-16">
+  <div class="page-header"><span class="page-date">March 1, 2026 · 4:22 PM</span><span class="page-tag" style="background:rgba(26,86,160,0.08);color:#1a56a0;">book notes 📖</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="25" y="12" width="80" height="110" rx="3" fill="#1565c0" opacity="0.85"/><rect x="32" y="19" width="66" height="96" rx="2" fill="#1976d2" opacity="0.9"/><rect x="25" y="12" width="10" height="110" rx="3" fill="#0d47a1"/><text x="68" y="48" font-family="Caveat" font-size="15" fill="white" text-anchor="middle" font-weight="bold">Boundaries</text><text x="68" y="65" font-family="Caveat" font-size="10" fill="#bbdefb" text-anchor="middle">Henry Cloud</text><text x="68" y="80" font-family="Caveat" font-size="10" fill="#bbdefb" text-anchor="middle">&amp; John Townsend</text><line x1="33" y1="100" x2="98" y2="100" stroke="white" stroke-width="1" opacity="0.4"/><line x1="43" y1="95" x2="43" y2="108" stroke="white" stroke-width="1" opacity="0.4"/><line x1="57" y1="95" x2="57" y2="108" stroke="white" stroke-width="1" opacity="0.4"/><line x1="71" y1="95" x2="71" y2="108" stroke="white" stroke-width="1" opacity="0.4"/><line x1="85" y1="95" x2="85" y2="108" stroke="white" stroke-width="1" opacity="0.4"/><text x="65" y="140" font-family="Caveat" font-size="12" fill="#1a56a0" text-anchor="middle">a property line</text><text x="65" y="155" font-family="Caveat" font-size="12" fill="#1a56a0" text-anchor="middle">that defines you 💙</text></svg></div>
+  <h2 class="page-title">Boundaries — Henry Cloud &amp; John 📖</h2>
+  <div class="page-body"><em>"Boundaries define us. They define what is me and what is not me."</em><br><br>🔹 <strong>Definition:</strong> "Boundaries help us keep the good in and the bad out."<br><br>🔹 <strong>Ownership:</strong> "Knowing what I am to own gives me freedom."<br><br>🔹 <strong>Relationship:</strong> "When we begin to set boundaries with people we love, they hurt."<br><br>🔹 <strong>Truth:</strong> "The fool tries to adjust the truth so he does not have to adjust to it."<br><br>🔹 <strong>Limits:</strong> "A boundary is a 'property line' that defines a person."</div>
+  <div class="page-quote">"Boundaries are not walls — they are the doors only the right people can open." 💙</div>
+  <div class="page-song"><div class="song-label">🎵 Moonlight Sonata · Beethoven</div><iframe src="https://open.spotify.com/embed/track/3dBVyJ7Dpx1JFVfQXmT6bZ?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">book: Boundaries · 3/1/26</div>
+  <div class="page-num">— 17 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 18 — NEVER TRUST SWEET WORDS -->
+<div class="book-page" id="jp-17">
+  <div class="page-header"><span class="page-date">March 2, 2026</span><span class="page-tag" style="background:rgba(194,24,91,0.08);color:#c2185b;">people 🕊️</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><ellipse cx="42" cy="65" rx="20" ry="14" fill="white" stroke="#90a4ae" stroke-width="1"/><circle cx="35" cy="58" r="9" fill="white" stroke="#90a4ae" stroke-width="1"/><ellipse cx="29" cy="57" rx="4.5" ry="2.5" fill="white" stroke="#90a4ae" stroke-width="0.5" transform="rotate(-20 29 57)"/><circle cx="31" cy="56" r="1.8" fill="#333"/><path d="M29 61 L25 65" stroke="#f57c00" stroke-width="2" stroke-linecap="round"/><ellipse cx="93" cy="63" rx="20" ry="14" fill="white" stroke="#90a4ae" stroke-width="1"/><circle cx="86" cy="56" r="9" fill="white" stroke="#90a4ae" stroke-width="1"/><ellipse cx="80" cy="55" rx="4.5" ry="2.5" fill="white" stroke="#90a4ae" stroke-width="0.5" transform="rotate(-20 80 55)"/><circle cx="82" cy="54" r="1.8" fill="#333"/><path d="M80 59 L76 63" stroke="#f57c00" stroke-width="2" stroke-linecap="round"/><text x="48" y="42" font-size="14" text-anchor="middle">🍭</text><text x="90" y="40" font-size="13" text-anchor="middle">⚠️</text><path d="M12 82 Q65 76 118 82" fill="none" stroke="#8d6e63" stroke-width="3"/><text x="65" y="108" font-family="Caveat" font-size="12" fill="#c2185b" text-anchor="middle">sugar on lips</text><text x="65" y="123" font-family="Caveat" font-size="12" fill="#6b6560" text-anchor="middle">watch actions 👁️</text><text x="65" y="145" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">not words</text></svg></div>
+  <h2 class="page-title">Never trust sweet words 🕊️</h2>
+  <div class="page-body"><strong>"Never trust sweet words — because nowadays people have sugar on their lips and poison in their soul."</strong><br><br>Actions. Always actions. Not words.<br><br>Watch what people <em>do</em> — not what they <em>say</em>.<br><br>The ones who show up when it's inconvenient — those are your people. Everyone else is just talking.</div>
+  <div class="page-quote">"Today I learned to watch what people do — not what they say." 🕊️</div>
+  <div class="page-song"><div class="song-label">🎵 Gymnopédie No.1 · Satie</div><iframe src="https://open.spotify.com/embed/track/5NGtFXVpXSvwunEIGeviY3?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">personal note · 3/2/26</div>
+  <div class="page-num">— 18 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 19 — RELATIONSHIPS & BOUNDARIES (FARSI) -->
+<div class="book-page" id="jp-18">
+  <div class="page-header"><span class="page-date">January 1, 2026 · 12:48 PM</span><span class="page-tag" style="background:rgba(26,86,160,0.08);color:#1a56a0;">relationships 💙</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><circle cx="40" cy="50" r="18" fill="#e3f2fd" stroke="#1a56a0" stroke-width="1.5"/><circle cx="90" cy="50" r="18" fill="#fce4ec" stroke="#c2185b" stroke-width="1.5"/><text x="40" y="55" font-size="16" text-anchor="middle">😊</text><text x="90" y="55" font-size="16" text-anchor="middle">😶</text><line x1="58" y1="50" x2="72" y2="50" stroke="#6b6560" stroke-width="1.5" stroke-dasharray="4,3"/><text x="65" y="45" font-size="11" text-anchor="middle">🚫</text><rect x="15" y="88" width="100" height="55" rx="6" fill="#e8f5e9" stroke="#2d7a3a" stroke-width="1"/><text x="65" y="106" font-family="Caveat" font-size="11" fill="#2d7a3a" text-anchor="middle">go toward spaces</text><text x="65" y="121" font-family="Caveat" font-size="11" fill="#2d7a3a" text-anchor="middle">that value your</text><text x="65" y="136" font-family="Caveat" font-size="11" fill="#2d7a3a" text-anchor="middle">presence &amp; effort 💙</text></svg></div>
+  <h2 class="page-title">Relationships &amp; Boundaries — what no one tells you 💙</h2>
+  <div class="page-body"><strong>"Some relationships become the slap you never needed."</strong><br><br>Our time is our most valuable asset. Trying to fix someone who doesn't want to change only exhausts us.<br><br>Not every experience needs to be a lesson. Some people are simply <strong>toxic</strong>.<br><br>A relationship means <strong>mutual interaction</strong> — staying and growing together, not just tolerating.<br><br>Go toward the spaces and people who <strong>value your presence and effort</strong>.</div>
+  <div class="page-quote">"Not every door that closes needs to be reopened — some are meant to stay shut." 💙</div>
+  <div class="page-song"><div class="song-label">🎵 Nuvole Bianche · Ludovico Einaudi</div><iframe src="https://open.spotify.com/embed/track/6f5FWvSrEqO2v7H2a4IBZG?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">saved note · 1/1/26</div>
+  <div class="page-num">— 19 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 20 — SELFISH -->
+<div class="book-page" id="jp-19">
+  <div class="page-header"><span class="page-date">January 1, 2026 · 12:52 PM</span><span class="page-tag" style="background:rgba(45,122,58,0.08);color:#2d7a3a;">self-first 🖤</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><circle cx="65" cy="55" r="32" fill="#2d7a3a" opacity="0.1" stroke="#2d7a3a" stroke-width="2"/><text x="65" y="65" font-size="32" text-anchor="middle">👑</text><text x="65" y="100" font-family="Caveat" font-size="14" fill="#2d7a3a" text-anchor="middle">YOU FIRST</text><text x="65" y="118" font-family="Caveat" font-size="12" fill="#6b6560" text-anchor="middle">خودت رو در</text><text x="65" y="133" font-family="Caveat" font-size="12" fill="#6b6560" text-anchor="middle">اولویت بزار</text><text x="65" y="150" font-size="14" text-anchor="middle">💚</text></svg></div>
+  <h2 class="page-title">Be selfish — put yourself first 🖤</h2>
+  <div class="page-body"><strong>خودت رو در اولویت بزار<br>دنیا همیشه به آدم‌های خودخواه پاداش میده لعنتی!</strong><br><br><em>Put yourself first.<br>The world always rewards the selfish ones.</em><br><br>This is not about being cruel.<br>This is about <strong>knowing your worth</strong> before anyone else does.<br><br>You cannot pour from an empty cup.<br>Fill yours first. Always.</div>
+  <div class="page-quote">"Self-first is not selfish — it is survival." 💚</div>
+  <div class="page-song"><div class="song-label">🎵 Clair de Lune · Debussy</div><iframe src="https://open.spotify.com/embed/track/5XpSLMi7SOfMoWXCLklCOH?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">saved · 1/1/26</div>
+  <div class="page-num">— 20 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 21 — VASI BASH -->
+<div class="book-page" id="jp-20">
+  <div class="page-header"><span class="page-date">February 18, 2026 · 10:26 PM</span><span class="page-tag" style="background:rgba(109,40,217,0.08);color:#6d28d9;">moment 🏛️</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="30" y="80" width="70" height="60" rx="2" fill="#ede9e0" stroke="#6d28d9" stroke-width="1.5"/><rect x="22" y="75" width="86" height="12" rx="2" fill="#6d28d9" opacity="0.6"/><line x1="45" y1="80" x2="45" y2="140" stroke="#6d28d9" stroke-width="2" opacity="0.5"/><line x1="65" y1="80" x2="65" y2="140" stroke="#6d28d9" stroke-width="2" opacity="0.5"/><line x1="85" y1="80" x2="85" y2="140" stroke="#6d28d9" stroke-width="2" opacity="0.5"/><text x="65" y="30" font-family="Caveat" font-size="14" fill="#6d28d9" text-anchor="middle">وسیع باش</text><text x="65" y="48" font-family="Caveat" font-size="14" fill="#6d28d9" text-anchor="middle">تنها باش</text><text x="65" y="66" font-family="Caveat" font-size="14" fill="#6d28d9" text-anchor="middle">سخت باش</text><text x="65" y="155" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">10:26 PM 🏛️</text></svg></div>
+  <h2 class="page-title">Vasi Bash — be vast, alone, strong 🏛️</h2>
+  <div class="page-body"><em>Feb 18 · Civil Engineering Building · 10:26 PM :))))))))))))))))</em><br><br><strong>وسیع باش، تنها باش، سخت باش.</strong><br><em>Be vast. Be alone. Be tough.</em><br><br>Some nights you sit in a building full of people and feel completely alone — and that's okay. That solitude is building something inside you.<br><br>The fact that you were there at 10:26PM, still going — says everything. 🐰</div>
+  <div class="page-quote">"Being alone is not the same as being lonely — one is imposed, the other is chosen." 🏛️</div>
+  <div class="page-song"><div class="song-label">🎵 Experience · Ludovico Einaudi</div><iframe src="https://open.spotify.com/embed/track/1BncfTMTXPY42OFPqSaZ5p?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">personal note · Civil Engineering Building · 2/18/26</div>
+  <div class="page-num">— 21 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 22 — SAFEST PLACE -->
+<div class="book-page" id="jp-21">
+  <div class="page-header"><span class="page-date">February 22, 2026 · 2AM–5AM</span><span class="page-tag" style="background:rgba(26,86,160,0.08);color:#1a56a0;">safe place 🌙</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="8" y="8" width="114" height="90" rx="6" fill="#0d1b4b" opacity="0.85"/><circle cx="30" cy="28" r="1.5" fill="white" opacity="0.9"/><circle cx="65" cy="20" r="1" fill="white" opacity="0.7"/><circle cx="100" cy="32" r="2" fill="white" opacity="0.8"/><circle cx="80" cy="22" r="1.5" fill="white" opacity="0.6"/><rect x="20" y="55" width="90" height="35" rx="2" fill="#1565c0" opacity="0.6"/><text x="22" y="70" font-size="12">🏛️</text><text x="65" y="70" font-family="Caveat" font-size="11" fill="white" text-anchor="middle" opacity="0.8">Library UA</text><text x="65" y="83" font-family="Caveat" font-size="10" fill="#bbdefb" text-anchor="middle">2AM — 5AM</text><text x="65" y="120" font-family="Caveat" font-size="12" fill="#1a56a0" text-anchor="middle">درگیر باش</text><text x="65" y="136" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">be consumed</text><text x="65" y="150" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">by the good things 🌙</text></svg></div>
+  <h2 class="page-title">The safest place and the safest people 🌙</h2>
+  <div class="page-body"><em>Dishab bidar boodam az 2AM–5AM · Library-UA</em><br><br><strong>درگیر باش — درگیر درس، کار، هنر، موسیقی، هرچیزی به جز انسان‌ها...</strong><br><em>Be consumed — by study, work, art, music. Anything but people.</em><br><br>«هیچ آدمی نمی‌تواند بیشتر از خودمان «امن» باشد. پناهگاه دائمی ما «خودمان» هستیم.»<br><br><strong>«برد تو سکوت قشنگه، بذار فکر کنی همون بازنده بدبختی!»</strong><br><em>Your silence is beautiful. Let them think you're losing.</em></div>
+  <div class="page-quote">"The safest place in the world is inside yourself — no one else can give you that." 🌙</div>
+  <div class="page-song"><div class="song-label">🎵 River Flows in You · Yiruma</div><iframe src="https://open.spotify.com/embed/track/3TGHJHqXBCgGkFiMJBCsmx?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">Library UA · 2AM–5AM · 2/22/26</div>
+  <div class="page-num">— 22 —</div><div class="page-corner"></div>
+</div>
+
+<!-- PAGE 23 — ILLUSION QUANTUM MIRROR -->
+<div class="book-page" id="jp-22">
+  <div class="page-header"><span class="page-date">March 1, 2026 · 10:09 PM</span><span class="page-tag" style="background:rgba(109,40,217,0.08);color:#6d28d9;">quantum 🪞</span></div>
+  <div class="page-illo"><svg viewBox="0 0 130 150"><rect x="20" y="10" width="42" height="70" rx="4" fill="#e8eaf6" stroke="#6d28d9" stroke-width="1.5"/><rect x="68" y="10" width="42" height="70" rx="4" fill="#e8eaf6" stroke="#6d28d9" stroke-width="1.5"/><text x="41" y="52" font-size="22" text-anchor="middle">🧍</text><text x="89" y="52" font-size="22" text-anchor="middle">🧍</text><line x1="62" y1="45" x2="68" y2="45" stroke="#6d28d9" stroke-width="1.5" stroke-dasharray="2,2"/><text x="65" y="42" font-size="11" text-anchor="middle">🪞</text><text x="65" y="98" font-family="Caveat" font-size="12" fill="#6d28d9" text-anchor="middle">everything is</text><text x="65" y="113" font-family="Caveat" font-size="12" fill="#6d28d9" text-anchor="middle">a mirror</text><text x="65" y="130" font-family="Caveat" font-size="12" fill="#6d28d9" text-anchor="middle">we are all one 🌍</text><text x="65" y="148" font-family="Caveat" font-size="11" fill="#6b6560" text-anchor="middle">in different bodies</text></svg></div>
+  <h2 class="page-title">Illusion — there is no 'you' and no 'other' 🪞</h2>
+  <div class="page-body"><strong>"Illusion: There is no 'you,' and there is no 'other.' In this quantum reality, everything functions as a mirror."</strong><br><br><em>...is a celebration of what already exists!</em><br><br>Every person who triggers you — is showing you something about yourself.<br>Every person who inspires you — is reflecting back what already lives in you.<br><br>There is no separation.<br><strong>What you see in others — is always you.</strong><br><br>We are all one. In different bodies. 🌍</div>
+  <div class="page-quote">"The people who irritate me the most are my greatest teachers — they are my mirror." 🪞</div>
+  <div class="page-song"><div class="song-label">🎵 Comptine d'un autre été · Yann Tiersen</div><iframe src="https://open.spotify.com/embed/track/4O2N861eOnF9q8EtpH8IJu?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;"></iframe></div>
+  <div class="page-source">personal note · 3/1/26 · 10:09 PM</div>
+  <div class="page-num">— 23 —</div><div class="page-corner"></div>
+</div>
+
+</div><!-- end book-outer -->
+
+<div class="book-nav" style="margin-top:1.25rem;">
+  <button class="book-btn" id="jbtn-prev" onclick="jChangePage(-1)" disabled>← prev</button>
+  <span class="book-progress" id="jbook-progress">1 / 23</span>
+  <button class="book-btn" id="jbtn-next" onclick="jChangePage(1)">next →</button>
+</div>
+<div class="book-dots" id="jbook-dots"></div>
+
+</div><!-- end journal-wrap -->
+
+<div class="music-bar" id="music-bar">
+  <span class="music-label">🎵 Clair de Lune · Debussy</span>
+  <iframe src="https://open.spotify.com/embed/track/5XpSLMi7SOfMoWXCLklCOH?utm_source=generator&theme=0" width="100%" height="52" frameborder="0" allow="autoplay;clipboard-write;encrypted-media;fullscreen;picture-in-picture" loading="lazy" style="border-radius:8px;flex:1;"></iframe>
+  <button class="music-close" onclick="document.getElementById('music-bar').style.display='none'">✕</button>
+</div>
+<div style="height:72px;"></div>
+
+<script>
+var jCurrent=0,jTotal=23;
+var dotsEl=document.getElementById('jbook-dots');
+for(var i=0;i<jTotal;i++){
+  var d=document.createElement('button');
+  d.className='book-dot'+(i===0?' active':'');
+  (function(idx){d.onclick=function(){jGoPage(idx);};})(i);
+  dotsEl.appendChild(d);
+}
+function jGoPage(n){
+  if(n<0||n>=jTotal)return;
+  document.getElementById('jp-'+jCurrent).classList.remove('active');
+  document.querySelectorAll('#jbook-dots .book-dot')[jCurrent].classList.remove('active');
+  jCurrent=n;
+  document.getElementById('jp-'+jCurrent).classList.add('active');
+  document.querySelectorAll('#jbook-dots .book-dot')[jCurrent].classList.add('active');
+  document.getElementById('jbook-progress').textContent=(jCurrent+1)+' / '+jTotal;
+  document.getElementById('jbtn-prev').disabled=jCurrent===0;
+  document.getElementById('jbtn-next').disabled=jCurrent===jTotal-1;
+  document.querySelector('.journal-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function jChangePage(dir){jGoPage(jCurrent+dir);}
+</script>
+</body>
+</html>
