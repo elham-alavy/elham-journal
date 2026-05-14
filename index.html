@@ -83,6 +83,11 @@ nav{position:fixed;top:0;width:100%;z-index:200;background:rgba(250,248,244,0.96
 </div>
 
 <div class="journal-wrap">
+<div class="book-nav" style="margin-bottom:1rem;">
+  <button class="book-btn" id="jbtn-prev-top" onclick="jChangePage(-1)" disabled>← prev</button>
+  <span class="book-progress" id="jbook-progress-top">1 / 22</span>
+  <button class="book-btn" id="jbtn-next-top" onclick="jChangePage(1)">next →</button>
+</div>
 <div class="book-outer">
 <div class="book-spine"><span class="spine-text">Elham's Journal · لحظاتی که موندن</span></div>
 
@@ -293,9 +298,13 @@ function jGoPage(n){
   jCurrent=n;
   document.getElementById('jp-'+jCurrent).classList.add('active');
   document.querySelectorAll('#jbook-dots .book-dot')[jCurrent].classList.add('active');
-  document.getElementById('jbook-progress').textContent=(jCurrent+1)+' / '+jTotal;
+  var prog=(jCurrent+1)+' / '+jTotal;
+  document.getElementById('jbook-progress').textContent=prog;
+  document.getElementById('jbook-progress-top').textContent=prog;
   document.getElementById('jbtn-prev').disabled=jCurrent===0;
   document.getElementById('jbtn-next').disabled=jCurrent===jTotal-1;
+  document.getElementById('jbtn-prev-top').disabled=jCurrent===0;
+  document.getElementById('jbtn-next-top').disabled=jCurrent===jTotal-1;
   document.querySelector('.journal-wrap').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function jChangePage(dir){jGoPage(jCurrent+dir);}
